@@ -1,8 +1,14 @@
 import React from 'react';
-import Movie from './src/screens/Movie';
+import {StatusBar} from 'react-native';
+import StackNavigator from './StackNavigator';
 
 const App = () => {
-  return <Movie />;
+  return (
+    <>
+      <StackNavigator />
+      <StatusBar style="auto" />
+    </>
+  );
 };
 
 export default App;
