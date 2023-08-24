@@ -2,9 +2,12 @@ import {FlatList, Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import React from 'react';
 import movies from '../data/movies';
 import Header from './Header';
+import {useNavigation} from '@react-navigation/native';
 
 const MovieCards = () => {
   const data = movies;
+
+  const navigation = useNavigation();
 
   return (
     <View>
@@ -27,7 +30,7 @@ const MovieCards = () => {
               style={{
                 fontSize: 16,
                 fontWeight: '600',
-                width: 170,
+                width: 175,
                 marginTop: 10,
               }}>
               {item.name.substring(0, 16) + '...'}
@@ -40,6 +43,11 @@ const MovieCards = () => {
               {item.genre}
             </Text>
             <Pressable
+              onPress={() =>
+                navigation.navigate('Movies', {
+                  movieTitle: item.name,
+                })
+              }
               style={{
                 backgroundColor: '#ffc40c',
                 padding: 10,
