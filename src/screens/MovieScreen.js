@@ -1,14 +1,16 @@
 import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import moment from 'moment-jalaali';
 import HorizontalDatepicker from '@awrminkhodaei/react-native-horizontal-datepicker';
 import malls from '../data/malls';
+import {MoviesCards} from '../../Context';
 
 const MovieScreen = ({route, navigation}) => {
   const [selectedDate, setSelectedDate] = useState('');
+  const [seatsData, setSeatsData] = useState([]);
   const [mall, setMall] = useState('');
 
   const mallsData = malls;
@@ -79,6 +81,7 @@ const MovieScreen = ({route, navigation}) => {
           key={index}
           onPress={() => {
             setMall(item.name);
+            setSeatsData(item.tableData);
           }}>
           <Text style={{fontSize: 16, fontWeight: '500'}}>{item.name}</Text>
 
@@ -88,6 +91,14 @@ const MovieScreen = ({route, navigation}) => {
               data={item.showtimes}
               renderItem={({item}) => (
                 <Pressable
+                  onPress={() => {
+                    navigation.navigate('Theatre', {
+                      mall: mall,
+                      name: route.params.movieTitle,
+                      timeSelected: item,
+                      tableSeats: seatsData,
+                    });
+                  }}
                   style={{
                     borderColor: 'green',
                     borderWidth: 0.5,
