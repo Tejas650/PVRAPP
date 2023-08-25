@@ -1,12 +1,15 @@
-import {FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
+import {Alert, FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
 import React, {useContext} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import {MoviesCards} from '../../Context';
+import {useStripe} from '@stripe/stripe-react-native';
 
 const TheatreScreen = ({route, navigation}) => {
   const {seats, setSeats} = useContext(MoviesCards);
+
+  const stripe = useStripe();
 
   console.log('Seats Occupied', seats);
 
@@ -19,6 +22,10 @@ const TheatreScreen = ({route, navigation}) => {
     }
   };
 
+  const fee = 87;
+  const noOfSeats = seats.length;
+  const total = seats.length > 0 ? fee + noOfSeats * 240 : 0;
+
   const showSeats = () => (
     <View style={{flexDirection: 'row', alignItems: 'center'}}>
       {seats.map((seat, index) => (
@@ -30,6 +37,33 @@ const TheatreScreen = ({route, navigation}) => {
       ))}
     </View>
   );
+
+  const subScribe = async () => {
+    const response = await fetch('http://localhost:8000/payment', {
+      method: 'POST',
+      body: JSON.stringify({
+        amount: Math.floor(total * 100),
+      }),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    const datas = await response.json();
+    console.log(datas);
+    if (!response.ok) return Alert.alert(datas.message);
+    const clientSecret = datas.clientSecret;
+    const initSheet = await stripe.initPaymentSheet({
+      paymentIntentClientSecret: clientSecret,
+    });
+    if (initSheet.error) return Alert.alert(initSheet.error.message);
+    const presentSheet = await stripe.presentPaymentSheet({
+      clientSecret,
+    });
+    if (presentSheet.error) return Alert.alert(presentSheet.error.message);
+    else {
+      navigation.navigate('Ticket');
+    }
+  };
 
   return (
     <SafeAreaView>
@@ -212,8 +246,8 @@ const TheatreScreen = ({route, navigation}) => {
           <Text></Text>
         )}
 
-        <Pressable>
-          <Text style={{fontSize: 17, fontWeight: '600'}}>PAY ₹0</Text>
+        <Pressable onPress={subScribe}>
+          <Text style={{fontSize: 17, fontWeight: '600'}}>PAY ₹{total}</Text>
         </Pressable>
       </Pressable>
     </SafeAreaView>
