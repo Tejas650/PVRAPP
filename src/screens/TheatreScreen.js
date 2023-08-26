@@ -1,5 +1,5 @@
 import {Alert, FlatList, Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useContext} from 'react';
+import React, {useContext, useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -7,9 +7,11 @@ import {MoviesCards} from '../../Context';
 import {useStripe} from '@stripe/stripe-react-native';
 
 const TheatreScreen = ({route, navigation}) => {
-  const {seats, setSeats} = useContext(MoviesCards);
+  const {seats, setSeats, occupied} = useContext(MoviesCards);
 
   const stripe = useStripe();
+
+  console.log('Seat Freezed', occupied);
 
   console.log('Seats Occupied', seats);
 
@@ -22,8 +24,11 @@ const TheatreScreen = ({route, navigation}) => {
     }
   };
 
-  const fee = 87;
+  const displaySeats = [...seats];
+
+  const fee = 89;
   const noOfSeats = seats.length;
+  const priceVal = noOfSeats * 240;
   const total = seats.length > 0 ? fee + noOfSeats * 240 : 0;
 
   const showSeats = () => (
@@ -61,7 +66,19 @@ const TheatreScreen = ({route, navigation}) => {
     });
     if (presentSheet.error) return Alert.alert(presentSheet.error.message);
     else {
-      navigation.navigate('Ticket');
+      occupied.push(...seats);
+      navigation.navigate('Ticket', {
+        name: route.params.name,
+        mall: route.params.mall,
+        timeSelected: route.params.timeSelected,
+        total: total,
+        date: route.params.date,
+        image: route.params.image,
+        selectedSeats: displaySeats,
+        seatPrice: priceVal,
+      });
+
+      setSeats([]);
     }
   };
 
@@ -130,6 +147,7 @@ const TheatreScreen = ({route, navigation}) => {
           data={route.params.tableSeats}
           renderItem={({item}) => (
             <Pressable
+              disabled={occupied.includes(...seats, item)}
               onPress={() => onSeatSelected(item)}
               style={{
                 margin: 10,
@@ -142,6 +160,15 @@ const TheatreScreen = ({route, navigation}) => {
                   style={{
                     padding: 8,
                     backgroundColor: '#ffc40c',
+                    textAlign: 'center',
+                  }}>
+                  {item}
+                </Text>
+              ) : occupied.includes(item) ? (
+                <Text
+                  style={{
+                    padding: 8,
+                    backgroundColor: '#989898',
                     textAlign: 'center',
                   }}>
                   {item}

@@ -97,6 +97,8 @@ const MovieScreen = ({route, navigation}) => {
                       name: route.params.movieTitle,
                       timeSelected: item,
                       tableSeats: seatsData,
+                      date: selectedDate,
+                      image: route.params.image,
                     });
                   }}
                   style={{
