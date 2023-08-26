@@ -1,19 +1,23 @@
 import {FlatList, Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import movies from '../data/movies';
 import Header from './Header';
 import {useNavigation} from '@react-navigation/native';
+import {MoviesCards} from '../../Context';
+import TicketComponent from './TicketComponent';
 
 const MovieCards = () => {
   const data = movies;
 
   const navigation = useNavigation();
 
+  const {ticket} = useContext(MoviesCards);
+
   return (
     <View>
       <FlatList
         showsVerticalScrollIndicator={false}
-        ListHeaderComponent={Header}
+        ListHeaderComponent={ticket.length > 0 ? TicketComponent : Header}
         numColumns={2}
         data={data}
         renderItem={({item}) => (
