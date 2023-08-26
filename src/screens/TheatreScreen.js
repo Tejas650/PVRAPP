@@ -24,8 +24,11 @@ const TheatreScreen = ({route, navigation}) => {
     }
   };
 
-  const fee = 87;
+  const displaySeats = [...seats];
+
+  const fee = 89;
   const noOfSeats = seats.length;
+  const priceVal = noOfSeats * 240;
   const total = seats.length > 0 ? fee + noOfSeats * 240 : 0;
 
   const showSeats = () => (
@@ -71,6 +74,8 @@ const TheatreScreen = ({route, navigation}) => {
         total: total,
         date: route.params.date,
         image: route.params.image,
+        selectedSeats: displaySeats,
+        seatPrice: priceVal,
       });
 
       setSeats([]);
