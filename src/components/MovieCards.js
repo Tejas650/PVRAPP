@@ -46,6 +46,7 @@ const MovieCards = () => {
               onPress={() =>
                 navigation.navigate('Movies', {
                   movieTitle: item.name,
+                  image: item.image,
                 })
               }
               style={{
